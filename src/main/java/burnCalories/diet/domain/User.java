@@ -31,15 +31,22 @@ public class User implements UserDetails {
     private String nickname;
     @Column
     private String email;
+    @Column
+    private double height;
+    @Column
+    private double weight;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "members_roles")
     private List<String> roles = new ArrayList<>();
 
-    public User(String username, String password, String nickname, String email, List<String> roles) {
+    public User(String username, String password, String nickname, String email, double height, double weight, List<String> roles) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
+        this.height = height;
+        this.weight = weight;
         this.roles = roles;
     }
 
@@ -49,6 +56,9 @@ public class User implements UserDetails {
     public void changeNickname(String nickname) {
         this.nickname = nickname;
     }
+    public void changeHeight(double height){ this.height = height;}
+    public void changeWeight(double weight) { this.weight = weight;}
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 

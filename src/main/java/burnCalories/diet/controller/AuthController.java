@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import burnCalories.diet.DTO.securityDTO.LoginDTO;
 import burnCalories.diet.DTO.securityDTO.SignUpDTO;
-import burnCalories.diet.DTO.securityDTO.UpdateDTO;
+import burnCalories.diet.DTO.securityDTO.UpdatePasswordDTO;
 import burnCalories.diet.Jwt.JwtToken;
 import burnCalories.diet.domain.User;
 import burnCalories.diet.service.AuthService;
@@ -40,9 +40,9 @@ public class AuthController {
     }
 
     @PutMapping("/changePass")
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdateDTO updateDTO) {
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDTO updatePasswordDTO) {
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        memberService.update(updateDTO,principal);
+        memberService.update(updatePasswordDTO,principal);
         return ResponseEntity.ok("비밀번호를 변경하였습니다.");
     }
 

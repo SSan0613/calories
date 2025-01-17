@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class UpdateDTO {
+public class UpdatePasswordDTO {
     private String password;
     @Size(min = 4, max = 12)
     private String changedPassword;

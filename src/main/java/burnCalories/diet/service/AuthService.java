@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import burnCalories.diet.DTO.securityDTO.SignUpDTO;
-import burnCalories.diet.DTO.securityDTO.UpdateDTO;
+import burnCalories.diet.DTO.securityDTO.UpdatePasswordDTO;
 import burnCalories.diet.Jwt.JwtToken;
 import burnCalories.diet.Jwt.JwtTokenProvider;
 import burnCalories.diet.domain.User;
@@ -62,17 +62,17 @@ public class AuthService {
         if (signUpDTO.is_Teacher()) {
             roles.add("ADMIN");
         }
-        User user = new User(signUpDTO.getUsername(), passwordEncoder.encode(signUpDTO.getPassword()), signUpDTO.getNickname(), signUpDTO.getEmail(), roles);
+        User user = new User(signUpDTO.getUsername(), passwordEncoder.encode(signUpDTO.getPassword()), signUpDTO.getNickname(), signUpDTO.getEmail(), signUpDTO.getHeight(),signUpDTO.getWeight(),roles);
         userRepository.save(user);
     }
 
-    public void update(UpdateDTO updateDTO, User findUser) {
-        if (!updateDTO.getChangedPassword().equals(updateDTO.getChangedPasswordConfirm())) {
+    public void update(UpdatePasswordDTO updatePasswordDTO, User findUser) {
+        if (!updatePasswordDTO.getChangedPassword().equals(updatePasswordDTO.getChangedPasswordConfirm())) {
             throw new IllegalArgumentException("변경한 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
      //   Member findMember = memberRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        findUser.changePassword(passwordEncoder.encode(updateDTO.getChangedPassword()));
+        findUser.changePassword(passwordEncoder.encode(updatePasswordDTO.getChangedPassword()));
         userRepository.save(findUser);
     }
 
