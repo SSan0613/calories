@@ -42,10 +42,12 @@ public class UserController {
         return ResponseEntity.ok("회원정보 수정 완료");
     }
 
+
     @PostMapping("/log")
     public ResponseEntity<String> putExerciseLog(@AuthenticationPrincipal String username, @RequestBody @Valid ExerciseLogDTO exerciseLog) {
         try {
             userService.validateDate(exerciseLog);
+
             userService.putExerciseLog(username, exerciseLog);
             return ResponseEntity.ok("운동 기록 완료");
         } catch (Exception e) {
