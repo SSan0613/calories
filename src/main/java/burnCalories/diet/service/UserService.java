@@ -69,7 +69,7 @@ public class UserService {
         log.info(String.valueOf(exerciseLog.getStartTime()));
         log.info(String.valueOf(exerciseLog.getEndTime()));
         //머신러닝 모델에서 예상 칼로리 반환
-        double calories = requestCalories(duration,exerciseType);
+        double calories = requestCalories(durationFloat,exerciseType);
 
         User user = userRepository.findByUsername(username).get();
 
@@ -79,20 +79,21 @@ public class UserService {
 
     }
 
-    private double requestCalories(Duration duration, String exerciseType) {
+    private double requestCalories(double duration, String exerciseType) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("exerciseType", exerciseType);
         requestBody.put("duration", duration);
 
         try {
             return WebClient.builder()
-                    .baseUrl("http://caloriesML")
+                    .baseUrl("localhost:5000")
                     .build().post()
                     .uri("/predict")
                     .header("Content-Type","application/json")
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(Double.class)
+                    .timeout(Duration.ofSeconds(8)) //8초 타임아웃
                     .block();
         } catch (Exception e) {
             log.info("ML model request or response error");
