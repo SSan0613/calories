@@ -1,5 +1,6 @@
 package burnCalories.diet.domain;
 
+import burnCalories.diet.DTO.userDTO.exerciseLog.ExerciseLogDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Records {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
@@ -33,6 +34,14 @@ public class Records {
         this.startTime = startTime;
         this.endTime = endTime;
         this.exerciseType = exerciseType;
+        this.duration = duration;
+        this.calories = calories;
+    }
+
+    public void updateExerciseLog(ExerciseLogDTO exerciseLogDTO, float duration, double calories) {
+        this.exerciseType = exerciseLogDTO.getExerciseType();
+        this.startTime = exerciseLogDTO.getStartTime();
+        this.endTime = exerciseLogDTO.getEndTime();
         this.duration = duration;
         this.calories = calories;
     }

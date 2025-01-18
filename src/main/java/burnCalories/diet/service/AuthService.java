@@ -17,6 +17,7 @@ import burnCalories.diet.domain.User;
 import burnCalories.diet.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -66,17 +67,18 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public void update(UpdatePasswordDTO updatePasswordDTO, User findUser) {
+    public void update(UpdatePasswordDTO updatePasswordDTO, String username) {
         if (!updatePasswordDTO.getChangedPassword().equals(updatePasswordDTO.getChangedPasswordConfirm())) {
             throw new IllegalArgumentException("변경한 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
-
-     //   Member findMember = memberRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        User findUser = userRepository.findByUsername(username).get();
+        //   Member findMember = memberRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         findUser.changePassword(passwordEncoder.encode(updatePasswordDTO.getChangedPassword()));
         userRepository.save(findUser);
     }
 
-    public void delete(User user) {
+    public void delete(String username) {
+        User user = userRepository.findByUsername(username).get();
         userRepository.delete(user);
     }
 }

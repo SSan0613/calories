@@ -1,11 +1,9 @@
 package burnCalories.diet.repository.querydsl;
 
-import burnCalories.diet.DTO.userDTO.ResponseCaloriesLogDTO;
-import burnCalories.diet.DTO.userDTO.ResponseDurationLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseCaloriesLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseDurationLogDTO;
 import burnCalories.diet.domain.QRecords;
 import burnCalories.diet.domain.QUser;
-import burnCalories.diet.domain.Records;
-import burnCalories.diet.domain.User;
 import burnCalories.diet.repository.UserRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -17,11 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class RecordRepositoryCustomImplTest {

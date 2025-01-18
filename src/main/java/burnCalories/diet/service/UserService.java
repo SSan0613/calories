@@ -1,12 +1,13 @@
 package burnCalories.diet.service;
 
-import burnCalories.diet.DTO.userDTO.ResponseCaloriesLogDTO;
-import burnCalories.diet.DTO.userDTO.ResponseDurationLogDTO;
-import burnCalories.diet.DTO.userDTO.UpdateUserInfoDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseCaloriesLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseDurationLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseTodayLogDTO;
+import burnCalories.diet.DTO.userDTO.userinfo.UpdateUserInfoDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import burnCalories.diet.DTO.userDTO.ExerciseLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ExerciseLogDTO;
 import burnCalories.diet.domain.User;
 import burnCalories.diet.domain.Records;
 import burnCalories.diet.repository.RecordRepository;
@@ -20,6 +21,7 @@ import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,12 +60,7 @@ public class UserService {
     }
 
     public void putExerciseLog(String username, ExerciseLogDTO exerciseLog) {
-        LocalDateTime endDateTime = exerciseLog.getEndTime();
-        LocalDateTime startDateTime = exerciseLog.getStartTime();
-
-        Duration duration = Duration.between(startDateTime, endDateTime);
-
-        float durationFloat = (float) (duration.toMinutes() / 60.0);
+        float durationFloat = calculateDuration(exerciseLog);
         String exerciseType = exerciseLog.getExerciseType();
 
         log.info(String.valueOf(exerciseLog.getStartTime()));
@@ -79,6 +76,16 @@ public class UserService {
 
     }
 
+    private static float calculateDuration(ExerciseLogDTO exerciseLog) {
+        LocalDateTime endDateTime = exerciseLog.getEndTime();
+        LocalDateTime startDateTime = exerciseLog.getStartTime();
+
+        Duration duration = Duration.between(startDateTime, endDateTime);
+
+        float durationFloat = (float) (duration.toMinutes() / 60.0);
+        return durationFloat;
+    }
+
     private double requestCalories(double duration, String exerciseType) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("exerciseType", exerciseType);
@@ -86,7 +93,7 @@ public class UserService {
 
         try {
             return WebClient.builder()
-                    .baseUrl("localhost:5000")
+                    .baseUrl("http://localhost:5000")
                     .build().post()
                     .uri("/predict")
                     .header("Content-Type","application/json")
@@ -97,6 +104,7 @@ public class UserService {
                     .block();
         } catch (Exception e) {
             log.info("ML model request or response error");
+            log.error(e.getMessage());
             throw new IllegalArgumentException("failed to load model");
         }
     }
@@ -129,4 +137,25 @@ public class UserService {
         return caloriesLogs;
     }
 
+    public List<ResponseTodayLogDTO> getTodayExerciseLog() {
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        LocalDateTime start = LocalDateTime.now().with(LocalDateTime.MIN);
+        LocalDateTime end = LocalDateTime.now().with(LocalDateTime.MAX);
+
+        return recordRepository.findRecordsByDateTime(start,end,dateTime);
+
+    }
+
+    public void changeExerciseLog(Long id, ExerciseLogDTO exerciseLogDTO) {
+        Records findRecord = recordRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        float duration = calculateDuration(exerciseLogDTO);
+        double calories = requestCalories(duration, exerciseLogDTO.getExerciseType());
+        findRecord.updateExerciseLog(exerciseLogDTO,duration,calories);
+        recordRepository.save(findRecord);
+    }
+
+    public void deleteExerciseLog(Long id) {
+        recordRepository.deleteById(id);
+    }
 }

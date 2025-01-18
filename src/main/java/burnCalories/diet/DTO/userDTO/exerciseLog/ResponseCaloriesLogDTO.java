@@ -1,4 +1,4 @@
-package burnCalories.diet.DTO.userDTO;
+package burnCalories.diet.DTO.userDTO.exerciseLog;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

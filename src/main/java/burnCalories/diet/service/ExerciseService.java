@@ -1,6 +1,6 @@
 package burnCalories.diet.service;
 
-import burnCalories.diet.DTO.exercise.ResponseStats;
+import burnCalories.diet.DTO.stats.ResponseStats;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

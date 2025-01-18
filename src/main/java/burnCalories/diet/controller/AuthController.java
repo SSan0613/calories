@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import burnCalories.diet.DTO.securityDTO.LoginDTO;
@@ -40,16 +41,14 @@ public class AuthController {
     }
 
     @PutMapping("/changePass")
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDTO updatePasswordDTO) {
-        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        memberService.update(updatePasswordDTO,principal);
+    public ResponseEntity<String> updatePassword(@AuthenticationPrincipal String username, @Valid @RequestBody UpdatePasswordDTO updatePasswordDTO) {
+        memberService.update(updatePasswordDTO,username);
         return ResponseEntity.ok("비밀번호를 변경하였습니다.");
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        memberService.delete(user);
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal String username) {
+        memberService.delete(username);
         return ResponseEntity.ok("회원탈퇴가 완료되었습니다");
     }
 

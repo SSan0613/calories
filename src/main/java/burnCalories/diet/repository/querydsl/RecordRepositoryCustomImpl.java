@@ -1,9 +1,11 @@
 package burnCalories.diet.repository.querydsl;
 
-import burnCalories.diet.DTO.userDTO.ResponseCaloriesLogDTO;
-import burnCalories.diet.DTO.userDTO.ResponseDurationLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseCaloriesLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseDurationLogDTO;
+import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseTodayLogDTO;
 import burnCalories.diet.domain.QRecords;
 import burnCalories.diet.domain.QUser;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +50,17 @@ public class RecordRepositoryCustomImpl implements RecordRepositoryCustom {
                 .fetch();
 
         return recordsList;
+    }
+
+    @Override
+    public List<ResponseTodayLogDTO> findRecordsByDateTime(LocalDateTime start, LocalDateTime end, LocalDateTime dateTime) {
+        QRecords records = QRecords.records;
+
+        List<ResponseTodayLogDTO> todayExerciseLog = jpaQueryFactory.select(Projections.constructor(ResponseTodayLogDTO.class
+                        , records.id, records.exerciseType, records.duration, records.calories, records.startTime, records.endTime))
+                .from(records)
+                .where(records.startTime.between(start, end))
+                .fetch();
+        return todayExerciseLog;
     }
 }

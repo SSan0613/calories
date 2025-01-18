@@ -1,6 +1,6 @@
 package burnCalories.diet.controller;
 
-import burnCalories.diet.DTO.exercise.ResponseStats;
+import burnCalories.diet.DTO.stats.ResponseStats;
 import burnCalories.diet.service.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
