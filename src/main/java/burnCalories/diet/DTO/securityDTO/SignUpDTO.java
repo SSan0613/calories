@@ -19,10 +19,5 @@ public class SignUpDTO {
     private String nickname;
     @Email(message = "이메일 형식에 맞지 않습니다")
     private String email;
-    @NotNull
-    private double height;
-    @NotNull
-    private double weight;
-
-    private boolean is_Teacher;
+    private boolean is_Manager;
 }

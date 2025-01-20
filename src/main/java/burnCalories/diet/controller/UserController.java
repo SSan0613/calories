@@ -33,19 +33,24 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(authentication);
     }
-
+    //닉네임 수정
+    @PutMapping("/nickname")
+    public ResponseEntity<String> changeNickname(@AuthenticationPrincipal String username, @RequestBody String nickname) {
+        userService.changeNickname(username,nickname);
+        return ResponseEntity.ok("닉네임 변경 완료");
+    }
     //마이페이지 정보 호출
     @GetMapping("/info")
     public ResponseEntity<ResponseUserInfoDTO> getInfo(@AuthenticationPrincipal String username) {
-        User user = userRepository.findByUsername(username).get();
+        ResponseUserInfoDTO info = userService.getInfo(username);
 
-        log.info(user.getUsername(), user.getNickname());
-        return ResponseEntity.ok(new ResponseUserInfoDTO(user.getNickname(), user.getEmail(), user.getHeight(), user.getWeight()));
+        return ResponseEntity.ok(info);
     }
 
-    //정보 수정
+    //신체 정보 수정
     @PutMapping("/info")
     public ResponseEntity<String> changeInfo(@AuthenticationPrincipal String username, @RequestBody @Valid UpdateUserInfoDTO updateUserInfoDTO) {
+
         userService.changeInfo(username, updateUserInfoDTO);
 
         return ResponseEntity.ok("회원정보 수정 완료");

@@ -3,7 +3,9 @@ package burnCalories.diet.service;
 import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseCaloriesLogDTO;
 import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseDurationLogDTO;
 import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseTodayLogDTO;
+import burnCalories.diet.DTO.userDTO.userinfo.ResponseUserInfoDTO;
 import burnCalories.diet.DTO.userDTO.userinfo.UpdateUserInfoDTO;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,17 +33,33 @@ public class UserService {
     private final UserRepository userRepository;
     private final RecordRepository recordRepository;
 
+    public ResponseUserInfoDTO getInfo(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
+        return new ResponseUserInfoDTO(user);
+    }
+
+    @Transactional
+    public void changeNickname(String username, String nickname) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        user.changeNickname(nickname);
+    }
+
+    @Transactional
     public void changeInfo(String username, UpdateUserInfoDTO updateUserInfoDTO) {
-        User user = userRepository.findByUsername(username).get();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
+
+        user.changeInfo(updateUserInfoDTO);
+
+/*
         String changedNickname = updateUserInfoDTO.getNickname();
+
         double changedHeight = updateUserInfoDTO.getHeight();
         double chandgedWeight = updateUserInfoDTO.getWeight();
 
         if(!user.getNickname().equals(updateUserInfoDTO.getNickname())) user.changeNickname(changedNickname);
         if(user.getHeight()!=changedHeight) user.changeHeight(changedHeight);
         if(user.getWeight()!=chandgedWeight) user.changeWeight(chandgedWeight);
-
-        userRepository.save(user);
+*/
     }
 
     public void validateDate(ExerciseLogDTO exerciseLog) {
@@ -60,30 +78,30 @@ public class UserService {
     }
 
     public void putExerciseLog(String username, ExerciseLogDTO exerciseLog) {
-        float durationFloat = calculateDuration(exerciseLog);
+        double durationDouble = calculateDuration(exerciseLog);
         String exerciseType = exerciseLog.getExerciseType();
 
         log.info(String.valueOf(exerciseLog.getStartTime()));
         log.info(String.valueOf(exerciseLog.getEndTime()));
         //머신러닝 모델에서 예상 칼로리 반환
-        double calories = requestCalories(durationFloat,exerciseType);
+        double calories = requestCalories(durationDouble,exerciseType);
 
         User user = userRepository.findByUsername(username).get();
 
-        Records records = new Records(user, exerciseLog.getStartTime(), exerciseLog.getEndTime(), exerciseType, durationFloat, calories);
+        Records records = new Records(user, exerciseLog.getStartTime(), exerciseLog.getEndTime(), exerciseType, durationDouble, calories);
 
         recordRepository.save(records);
 
     }
 
-    private static float calculateDuration(ExerciseLogDTO exerciseLog) {
+    private static double calculateDuration(ExerciseLogDTO exerciseLog) {
         LocalDateTime endDateTime = exerciseLog.getEndTime();
         LocalDateTime startDateTime = exerciseLog.getStartTime();
 
         Duration duration = Duration.between(startDateTime, endDateTime);
 
-        float durationFloat = (float) (duration.toMinutes() / 60.0);
-        return durationFloat;
+        double durationDouble = (duration.toMinutes() / 60.0);
+        return durationDouble;
     }
 
     private double requestCalories(double duration, String exerciseType) {
@@ -140,22 +158,26 @@ public class UserService {
     public List<ResponseTodayLogDTO> getTodayExerciseLog() {
         LocalDateTime dateTime = LocalDateTime.now();
 
-        LocalDateTime start = LocalDateTime.now().with(LocalDateTime.MIN);
-        LocalDateTime end = LocalDateTime.now().with(LocalDateTime.MAX);
-
+        LocalDateTime start = LocalDateTime.now().with(LocalTime.MIN);
+        LocalDateTime end = LocalDateTime.now().with(LocalTime.MAX);
+        log.info(String.valueOf(start));
+        log.info(String.valueOf(end));
         return recordRepository.findRecordsByDateTime(start,end,dateTime);
 
     }
-
+    @Transactional
     public void changeExerciseLog(Long id, ExerciseLogDTO exerciseLogDTO) {
         Records findRecord = recordRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
-        float duration = calculateDuration(exerciseLogDTO);
+        double duration = calculateDuration(exerciseLogDTO);
         double calories = requestCalories(duration, exerciseLogDTO.getExerciseType());
         findRecord.updateExerciseLog(exerciseLogDTO,duration,calories);
-        recordRepository.save(findRecord);
+        //recordRepository.save(findRecord);
     }
 
     public void deleteExerciseLog(Long id) {
         recordRepository.deleteById(id);
     }
+
+
+
 }

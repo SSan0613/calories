@@ -25,11 +25,11 @@ public class Records {
     @Column
     private String exerciseType;
     @Column
-    private float duration;
+    private double duration;
     @Column
     private double calories;
 
-    public Records(User user, LocalDateTime startTime, LocalDateTime endTime, String exerciseType, float duration, double calories) {
+    public Records(User user, LocalDateTime startTime, LocalDateTime endTime, String exerciseType, double duration, double calories) {
         this.user = user;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -38,7 +38,7 @@ public class Records {
         this.calories = calories;
     }
 
-    public void updateExerciseLog(ExerciseLogDTO exerciseLogDTO, float duration, double calories) {
+    public void updateExerciseLog(ExerciseLogDTO exerciseLogDTO, double duration, double calories) {
         this.exerciseType = exerciseLogDTO.getExerciseType();
         this.startTime = exerciseLogDTO.getStartTime();
         this.endTime = exerciseLogDTO.getEndTime();

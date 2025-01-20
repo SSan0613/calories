@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ResponseDurationLogDTO {
     private String exerciseType;
-    private float duration;
+    private double duration;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 }

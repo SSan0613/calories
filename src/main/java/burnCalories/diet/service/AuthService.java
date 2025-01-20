@@ -1,5 +1,6 @@
 package burnCalories.diet.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import burnCalories.diet.domain.User;
 import burnCalories.diet.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,13 +60,14 @@ public class AuthService {
         }
         List<String> roles = new ArrayList<>();
         roles.add("USER");
-        if (signUpDTO.is_Teacher()) {
+        if (signUpDTO.is_Manager()) {
             roles.add("ADMIN");
         }
-        User user = new User(signUpDTO.getUsername(), passwordEncoder.encode(signUpDTO.getPassword()), signUpDTO.getNickname(), signUpDTO.getEmail(), signUpDTO.getHeight(),signUpDTO.getWeight(),roles);
+        User user = new User(signUpDTO.getUsername(), passwordEncoder.encode(signUpDTO.getPassword()), signUpDTO.getNickname(),signUpDTO.getEmail(),roles);
         userRepository.save(user);
     }
 
+    @Transactional
     public void update(UpdatePasswordDTO updatePasswordDTO, String username) {
         if (!updatePasswordDTO.getChangedPassword().equals(updatePasswordDTO.getChangedPasswordConfirm())) {
             throw new IllegalArgumentException("변경한 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
@@ -74,7 +75,7 @@ public class AuthService {
         User findUser = userRepository.findByUsername(username).get();
         //   Member findMember = memberRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         findUser.changePassword(passwordEncoder.encode(updatePasswordDTO.getChangedPassword()));
-        userRepository.save(findUser);
+        //userRepository.save(findUser);
     }
 
     public void delete(String username) {

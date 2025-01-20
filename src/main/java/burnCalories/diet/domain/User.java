@@ -1,5 +1,6 @@
 package burnCalories.diet.domain;
 
+import burnCalories.diet.DTO.userDTO.userinfo.UpdateUserInfoDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +28,7 @@ public class User implements UserDetails {
     private String username;
     @Column(nullable = false)
     private String password;
-    @Column
+    @Column(nullable = false)
     private String nickname;
     @Column
     private String email;
@@ -35,29 +36,42 @@ public class User implements UserDetails {
     private double height;
     @Column
     private double weight;
+    @Column
+    private Gender gender;
+    @Column
+    private int age;
+    @Column
+    private int is_manager;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "members_roles")
     private List<String> roles = new ArrayList<>();
 
-    public User(String username, String password, String nickname, String email, double height, double weight, List<String> roles) {
+    public User(String username, String password, String nickname, String email, List<String> roles) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
-        this.height = height;
-        this.weight = weight;
         this.roles = roles;
     }
 
+    public void changeInfo(UpdateUserInfoDTO updateUserInfoDTO) {
+        this.height = updateUserInfoDTO.getHeight();;
+        this.weight = updateUserInfoDTO.getWeight();
+        this.age = updateUserInfoDTO.getAge();
+        this.gender = updateUserInfoDTO.getGender();
+    }
     public void changePassword(String password) {
         this.password = password;
     }
     public void changeNickname(String nickname) {
         this.nickname = nickname;
     }
+
+/*
     public void changeHeight(double height){ this.height = height;}
     public void changeWeight(double weight) { this.weight = weight;}
+*/
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -86,7 +100,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 
 
