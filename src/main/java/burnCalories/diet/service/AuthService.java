@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,8 @@ public class AuthService {
     @Autowired
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    @Value("${manager.code}")
+    String adminSignupCode;
 
     public JwtToken signIn(String username, String password){
 
@@ -59,9 +62,12 @@ public class AuthService {
             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
         List<String> roles = new ArrayList<>();
-        roles.add("USER");
-        if (signUpDTO.is_Manager()) {
-            roles.add("ADMIN");
+        roles.add("ROLE_USER");
+        if (signUpDTO.getIsManager()!=null) {
+            if(signUpDTO.getManagerCode()==null ||!signUpDTO.getManagerCode().equals(adminSignupCode)){
+                throw new IllegalArgumentException("관리자 코드 오류");
+            }
+            roles.add("ROLE_ADMIN");
         }
         User user = new User(signUpDTO.getUsername(), passwordEncoder.encode(signUpDTO.getPassword()), signUpDTO.getNickname(),signUpDTO.getEmail(),roles);
         userRepository.save(user);

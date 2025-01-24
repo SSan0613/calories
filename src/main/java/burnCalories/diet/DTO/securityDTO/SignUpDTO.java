@@ -19,5 +19,16 @@ public class SignUpDTO {
     private String nickname;
     @Email(message = "이메일 형식에 맞지 않습니다")
     private String email;
-    private boolean is_Manager;
+    private Boolean isManager;
+    private String managerCode;
+
+    public SignUpDTO(String username, String password, String passwordConfirm, String nickname, String email, Boolean isManager, String managerCode) {
+        this.username = username;
+        this.password = password;
+        this.passwordConfirm = passwordConfirm;
+        this.nickname = nickname;
+        this.email = email;
+        this.isManager = isManager;
+        this.managerCode = managerCode;
+    }
 }

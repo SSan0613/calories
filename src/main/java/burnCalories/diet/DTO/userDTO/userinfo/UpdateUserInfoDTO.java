@@ -14,5 +14,5 @@ public class UpdateUserInfoDTO {
     @NotNull
     private int age;
     @NotNull
-    private Gender gender;
+    private String gender;
 }

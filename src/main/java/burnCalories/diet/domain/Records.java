@@ -1,6 +1,6 @@
 package burnCalories.diet.domain;
 
-import burnCalories.diet.DTO.userDTO.exerciseLog.ExerciseLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ExerciseLogDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

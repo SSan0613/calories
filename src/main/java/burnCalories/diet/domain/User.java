@@ -1,6 +1,7 @@
 package burnCalories.diet.domain;
 
 import burnCalories.diet.DTO.userDTO.userinfo.UpdateUserInfoDTO;
+import burnCalories.diet.DTO.userDTO.userinfo.changeNicknameDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +38,7 @@ public class User implements UserDetails {
     @Column
     private double weight;
     @Column
-    private Gender gender;
+    private String gender;
     @Column
     private int age;
     @Column
@@ -64,8 +65,8 @@ public class User implements UserDetails {
     public void changePassword(String password) {
         this.password = password;
     }
-    public void changeNickname(String nickname) {
-        this.nickname = nickname;
+    public void changeNickname(changeNicknameDTO nickname) {
+        this.nickname = nickname.getNickname();
     }
 
 /*

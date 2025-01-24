@@ -1,8 +1,9 @@
 package burnCalories.diet.repository.querydsl;
 
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseCaloriesLogDTO;
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseDurationLogDTO;
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseTodayLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseCaloriesLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseDurationLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseTodayLogDTO;
+import burnCalories.diet.domain.Challenge;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,4 +13,6 @@ public interface RecordRepositoryCustom {
     List<ResponseCaloriesLogDTO> findCaloriesBetweenStartEnd(LocalDateTime start, LocalDateTime end, String username);
 
     List<ResponseTodayLogDTO> findRecordsByDateTime(LocalDateTime start, LocalDateTime end, LocalDateTime dateTime);
+
+    double findbetweenByChallenge(Challenge challenge);
 }

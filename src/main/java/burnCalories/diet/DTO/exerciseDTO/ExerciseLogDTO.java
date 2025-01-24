@@ -1,4 +1,4 @@
-package burnCalories.diet.DTO.userDTO.exerciseLog;
+package burnCalories.diet.DTO.exerciseDTO;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

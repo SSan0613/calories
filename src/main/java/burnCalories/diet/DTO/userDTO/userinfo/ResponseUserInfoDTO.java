@@ -12,7 +12,7 @@ public class ResponseUserInfoDTO {
     private String email;
     private double height;
     private double weight;
-    private Gender gender;
+    private String gender;
     private int age;
 
 

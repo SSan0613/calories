@@ -1,12 +1,14 @@
 package burnCalories.diet.repository.querydsl;
 
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseCaloriesLogDTO;
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseDurationLogDTO;
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseTodayLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseCaloriesLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseDurationLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseTodayLogDTO;
+import burnCalories.diet.domain.Challenge;
+import burnCalories.diet.domain.QChallenge;
 import burnCalories.diet.domain.QRecords;
 import burnCalories.diet.domain.QUser;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -62,5 +64,30 @@ public class RecordRepositoryCustomImpl implements RecordRepositoryCustom {
                 .where(records.startTime.between(start, end))
                 .fetch();
         return todayExerciseLog;
+    }
+
+    @Override
+    public double findbetweenByChallenge(Challenge challenge) {
+
+        QRecords records = QRecords.records;
+        String goalType = challenge.getGoalType();
+
+        NumberExpression<Double> result = null;
+        if(goalType.equals("Duration")) {
+            result = records.duration.sum();
+        } else if (goalType.equals("Calories")) {
+            result = records.calories.sum();
+        }
+
+        Double v = jpaQueryFactory.select(result)
+                .from(records)
+                .where(records.startTime.between(challenge.getStartTime(), challenge.getEndTime())
+                        .and(records.endTime.between(challenge.getStartTime(), challenge.getEndTime())))
+                .fetchOne();
+
+        if (v == null) {
+            return 0.0;
+        }
+        return v;
     }
 }

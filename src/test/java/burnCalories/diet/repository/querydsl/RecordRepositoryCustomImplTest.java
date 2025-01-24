@@ -1,7 +1,7 @@
 package burnCalories.diet.repository.querydsl;
 
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseCaloriesLogDTO;
-import burnCalories.diet.DTO.userDTO.exerciseLog.ResponseDurationLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseCaloriesLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.ResponseDurationLogDTO;
 import burnCalories.diet.domain.QRecords;
 import burnCalories.diet.domain.QUser;
 import burnCalories.diet.repository.UserRepository;
