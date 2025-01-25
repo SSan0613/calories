@@ -3,6 +3,7 @@ package burnCalories.diet.service.challenge;
 import burnCalories.diet.DTO.challengeDTO.RequestChallengeDTO;
 import burnCalories.diet.DTO.challengeDTO.ResponseChallengeDetailsDTO;
 import burnCalories.diet.DTO.challengeDTO.ResponseChallengeListDTO;
+import burnCalories.diet.DTO.challengeDTO.ResponseRankingDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,4 +23,5 @@ public interface ChallengeService {
     void register(String username, Long id);
 
     void outChallenge(String username, Long id);
+
 }

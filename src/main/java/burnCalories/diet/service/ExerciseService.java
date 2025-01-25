@@ -1,6 +1,8 @@
 package burnCalories.diet.service;
 
 import burnCalories.diet.DTO.exerciseDTO.*;
+import burnCalories.diet.DTO.mlDTO.MLPredictedCaloriesDTO;
+import burnCalories.diet.DTO.mlDTO.MLRecommendDTO;
 import burnCalories.diet.domain.Records;
 import burnCalories.diet.domain.User;
 import burnCalories.diet.repository.RecordRepository;
@@ -8,7 +10,6 @@ import burnCalories.diet.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -28,14 +29,14 @@ public class ExerciseService {
     private final UserRepository userRepository;
     private final RecordRepository recordRepository;
 
-    public List<ResponseTodayLogDTO> getTodayExerciseLog() {
+    public List<ResponseTodayLogDTO> getTodayExerciseLog(String username){
         LocalDateTime dateTime = LocalDateTime.now();
 
         LocalDateTime start = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime end = LocalDateTime.now().with(LocalTime.MAX);
         log.info(String.valueOf(start));
         log.info(String.valueOf(end));
-        return recordRepository.findRecordsByDateTime(start,end,dateTime);
+        return recordRepository.findRecordsByUsernameAndDateTime(username,start,end,dateTime);
 
     }
 
@@ -70,6 +71,7 @@ public class ExerciseService {
     public void changeExerciseLog(String username,Long id, ExerciseLogDTO exerciseLogDTO) {
         Records findRecord = recordRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
+
         double duration = calculateDuration(exerciseLogDTO);
         double calories = requestCalories(duration, exerciseLogDTO.getExerciseType(),user);
         findRecord.updateExerciseLog(exerciseLogDTO,duration,calories);
@@ -113,6 +115,7 @@ public class ExerciseService {
 
         recordRepository.save(records);
 
+
     }
 
     private static double calculateDuration(ExerciseLogDTO exerciseLog) {
@@ -132,7 +135,7 @@ public class ExerciseService {
         int findExerciseType = workoutTypeMap.get(exerciseType);
         log.info("request exercisetype : " + findExerciseType);
         requestBody.put("workout_type", findExerciseType);
-        requestBody.put("session_duration", duration);
+        requestBody.put("session_duration", (double) duration);
         requestBody.put("age",user.getAge());
         if(user.getGender().equals("Female")) gender=1;
         requestBody.put("gender",gender);
@@ -140,16 +143,17 @@ public class ExerciseService {
         requestBody.put("height",user.getHeight());
 
         try {
-            return WebClient.builder()
+            MLPredictedCaloriesDTO predictedCalories = WebClient.builder()
                     .baseUrl("http://localhost:8000")
                     .build().post()
                     .uri("/predict-calories")
-                    .header("Content-Type","application/json")
+                    .header("Content-Type", "application/json")
                     .bodyValue(requestBody)
                     .retrieve()
-                    .bodyToMono(Double.class)
+                    .bodyToMono(MLPredictedCaloriesDTO.class)
                     .timeout(Duration.ofSeconds(8)) //8초 타임아웃
                     .block();
+            return predictedCalories.getCalories_burned();
         } catch (Exception e) {
             log.info("ML model request or response error");
             log.error(e.getMessage());
@@ -168,13 +172,13 @@ public class ExerciseService {
     }
 
 
-    public ResponseRecommendDTO recommendExercise(String username, double duration) {
+    public MLRecommendDTO recommendExercise(String username, double duration) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
 
         Map<String, Object> requestBody = new HashMap<>();
         int gender = 0;
 
-        requestBody.put("session_duration", duration);
+        requestBody.put("session_duration",  (double) duration);
         requestBody.put("age",user.getAge());
         if(user.getGender().equals("Female")) gender=1;
         requestBody.put("gender",gender);
@@ -182,21 +186,19 @@ public class ExerciseService {
         requestBody.put("height",user.getHeight());
 
         try {
-            Map<String, Object> response = WebClient.builder()
+            MLRecommendDTO recommendDTO = WebClient.builder()
                     .baseUrl("http://localhost:8000")
                     .build().post()
                     .uri("/recommend-workout")
                     .header("Content-Type", "application/json")
                     .bodyValue(requestBody)
                     .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
-                    })
+                    .bodyToMono(MLRecommendDTO.class)
                     .timeout(Duration.ofSeconds(8)) //8초 타임아웃
                     .block();
-            String recommendedWorkout = (String) response.get("recommended_workout");
-            double expectedCaloriesBurned = ((Number) response.get("expected_calories_burned")).doubleValue();
-
-            return new ResponseRecommendDTO(recommendedWorkout,expectedCaloriesBurned,duration);
+            return recommendDTO;
+/*            String recommendedWorkout = (String) response.get("recommended_workout");
+            double expectedCaloriesBurned = ((Number) response.get("expected_calories_burned")).doubleValue();*/
 
         } catch (Exception e) {
             log.info("ML model request or response error");

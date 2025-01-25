@@ -55,13 +55,14 @@ public class RecordRepositoryCustomImpl implements RecordRepositoryCustom {
     }
 
     @Override
-    public List<ResponseTodayLogDTO> findRecordsByDateTime(LocalDateTime start, LocalDateTime end, LocalDateTime dateTime) {
+    public List<ResponseTodayLogDTO> findRecordsByUsernameAndDateTime(String username, LocalDateTime start, LocalDateTime end, LocalDateTime dateTime) {
         QRecords records = QRecords.records;
 
         List<ResponseTodayLogDTO> todayExerciseLog = jpaQueryFactory.select(Projections.constructor(ResponseTodayLogDTO.class
                         , records.id, records.exerciseType, records.duration, records.calories, records.startTime, records.endTime))
                 .from(records)
-                .where(records.startTime.between(start, end))
+                .where(records.startTime.between(start, end)
+                        .and(records.user.username.eq(username)))
                 .fetch();
         return todayExerciseLog;
     }

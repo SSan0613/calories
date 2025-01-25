@@ -3,6 +3,7 @@ package burnCalories.diet.service.challenge;
 import burnCalories.diet.DTO.challengeDTO.RequestChallengeDTO;
 import burnCalories.diet.DTO.challengeDTO.ResponseChallengeDetailsDTO;
 import burnCalories.diet.DTO.challengeDTO.ResponseChallengeListDTO;
+import burnCalories.diet.DTO.challengeDTO.ResponseRankingDTO;
 import burnCalories.diet.domain.Challenge;
 import burnCalories.diet.domain.Participants;
 import burnCalories.diet.domain.User;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,14 +75,23 @@ public class PersonalChallengeServiceImpl implements ChallengeService{
     public ResponseChallengeDetailsDTO getChallenge(Long id,String username) {
         Challenge challenge = challengeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 챌린지입니다"));
         double myValue = 0;
+        boolean isComplete = false;
+        double percent = 0;
         Long count = participantRepository.countByChallenge(challenge);
 
         boolean isParticipant = participantRepository.existsByUsername(challenge,username);
         if(isParticipant){
-            myValue = recordRepository.findbetweenByChallenge(challenge);
+            /*myValue = recordRepository.findbetweenByChallenge(challenge);
+            percent = (myValue/ challenge.getGoalValue())*100;*/
+            Participants participants = participantRepository.findByUsernameAndChallengeId(username, challenge.getChallengeId());
+            myValue= participants.getMyValue();
+            percent = participants.getPercent();
+        }
+        if(percent>=100){
+            isComplete=true;
         }
 
-        return new ResponseChallengeDetailsDTO(challenge,count,isParticipant,myValue);
+        return new ResponseChallengeDetailsDTO(challenge,count,isParticipant,myValue,isComplete,percent);
     }
 
     @Override
@@ -88,7 +99,7 @@ public class PersonalChallengeServiceImpl implements ChallengeService{
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
         Challenge challenge = challengeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 챌린지입니다"));
 
-        participantRepository.save(new Participants(user, challenge));
+        participantRepository.save(new Participants(user, challenge, LocalDateTime.now()));
     }
 
     @Override

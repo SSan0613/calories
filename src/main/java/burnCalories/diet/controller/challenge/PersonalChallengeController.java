@@ -3,6 +3,8 @@ package burnCalories.diet.controller.challenge;
 import burnCalories.diet.DTO.challengeDTO.RequestChallengeDTO;
 import burnCalories.diet.DTO.challengeDTO.ResponseChallengeDetailsDTO;
 import burnCalories.diet.DTO.challengeDTO.ResponseChallengeListDTO;
+import burnCalories.diet.DTO.challengeDTO.ResponseRankingDTO;
+import burnCalories.diet.service.ProgressService;
 import burnCalories.diet.service.challenge.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ import java.util.List;
 public class PersonalChallengeController {
 
     private final ChallengeService challengeService;
-
+    private final ProgressService progressService;
     //챌린지 목록 조회
     @GetMapping
     public List<ResponseChallengeListDTO> getChallengeAll(@RequestParam(required = false) String exerciseType) {
@@ -39,7 +41,7 @@ public class PersonalChallengeController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseChallengeDetailsDTO> getChallenge(@AuthenticationPrincipal String username, @PathVariable Long id) {
 
-        ResponseChallengeDetailsDTO detailsDTO = challengeService.getChallenge(id,username);
+        ResponseChallengeDetailsDTO detailsDTO = challengeService.getChallenge(id, username);
         return ResponseEntity.ok(detailsDTO);
     }
 
@@ -70,5 +72,13 @@ public class PersonalChallengeController {
     public ResponseEntity<String> outChallenge(@AuthenticationPrincipal String username, @PathVariable Long id) {
         challengeService.outChallenge(username, id);
         return ResponseEntity.ok("챌린지 탈퇴 완료");
+    }
+
+    @GetMapping("{id}/rank")
+    public List<ResponseRankingDTO> getChallengeRanking(@AuthenticationPrincipal String username, @PathVariable Long id) {
+        List<ResponseRankingDTO> rankingList;
+        rankingList = progressService.getChallengeRanking(username, id);
+
+        return rankingList;
     }
 }

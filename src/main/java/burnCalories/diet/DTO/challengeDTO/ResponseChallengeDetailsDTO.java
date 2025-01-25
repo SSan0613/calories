@@ -34,8 +34,11 @@ public class ResponseChallengeDetailsDTO {
 
     private double myValue;
 
+    private Boolean isComplete = false;
 
-    public ResponseChallengeDetailsDTO(Challenge challenge,Long count, boolean isParticipant, double myValue) {
+    private double percent;
+
+    public ResponseChallengeDetailsDTO(Challenge challenge,Long count, boolean isParticipant, double myValue, boolean isComplete, double percent) {
         this.creatorNickname = challenge.getCreator().getNickname();
         this.title = challenge.getTitle();
         this.description = challenge.getDescription();
@@ -47,5 +50,7 @@ public class ResponseChallengeDetailsDTO {
         this.count = count;
         this.isParticipant = isParticipant;
         this.myValue= myValue;
+        this.isComplete = isComplete;
+        this.percent = percent;
     }
 }

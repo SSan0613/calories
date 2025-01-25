@@ -12,7 +12,7 @@ public interface RecordRepositoryCustom {
     List<ResponseDurationLogDTO> findDurationBetweenStartEnd(LocalDateTime start, LocalDateTime end, String username);
     List<ResponseCaloriesLogDTO> findCaloriesBetweenStartEnd(LocalDateTime start, LocalDateTime end, String username);
 
-    List<ResponseTodayLogDTO> findRecordsByDateTime(LocalDateTime start, LocalDateTime end, LocalDateTime dateTime);
+    List<ResponseTodayLogDTO> findRecordsByUsernameAndDateTime(String username, LocalDateTime start, LocalDateTime end, LocalDateTime dateTime);
 
     double findbetweenByChallenge(Challenge challenge);
 }

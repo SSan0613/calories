@@ -48,6 +48,8 @@ public class Challenge {
     private String exerciseType;
 
 
+
+
     public Challenge(RequestChallengeDTO requestChallengeDTO, User creator) {
         this.creator = creator;
         this.goalType = requestChallengeDTO.getGoalType();
