@@ -59,7 +59,7 @@ public class RecordRepositoryCustomImpl implements RecordRepositoryCustom {
         QRecords records = QRecords.records;
 
         List<ResponseTodayLogDTO> todayExerciseLog = jpaQueryFactory.select(Projections.constructor(ResponseTodayLogDTO.class
-                        , records.id, records.exerciseType, records.duration, records.calories, records.startTime, records.endTime))
+                        , records.id, records.exerciseType, records.calories, records.duration, records.startTime, records.endTime))
                 .from(records)
                 .where(records.startTime.between(start, end)
                         .and(records.user.username.eq(username)))

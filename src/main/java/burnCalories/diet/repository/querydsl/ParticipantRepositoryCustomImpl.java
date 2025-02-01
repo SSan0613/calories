@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class ParticipantRepositoryCustomImpl implements ParticipantRepositoryCustom {
@@ -72,7 +73,7 @@ public class ParticipantRepositoryCustomImpl implements ParticipantRepositoryCus
 
         QParticipants participants = QParticipants.participants;
 
-        Long userRank = jpaQueryFactory.select(participants.count())
+        Long userRank = Optional.ofNullable(jpaQueryFactory.select(participants.count())
                 .from(participants)
                 .where(participants.challenge.challengeId.eq(id)
                         .and(participants.percent.gt(
@@ -80,12 +81,11 @@ public class ParticipantRepositoryCustomImpl implements ParticipantRepositoryCus
                                         .select(participants.percent)
                                         .from(participants)
                                         .where(participants.user.username.eq(username)
-                                        )))
-                )
-                .fetchOne();
-        if (userRank == null) {
-            userRank=-1L;
-        }
+                                                .and(participants.challenge.challengeId.eq(id)))
+                        )))
+                .fetchOne()
+        ).orElse(0L);
+
         return userRank+1;
 
     }

@@ -21,7 +21,7 @@ import java.util.List;
 
 @EnableMethodSecurity
 @Configuration
-public class SecurityConfig {
+public class    SecurityConfig {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;

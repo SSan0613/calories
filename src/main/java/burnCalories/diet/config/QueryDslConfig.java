@@ -9,13 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class QueryDslConfig {
 
     private final EntityManager entityManager;
 
-    public QueryDslConfig(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     @Bean
     public JPAQueryFactory jpaQueryFactory() {

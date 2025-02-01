@@ -73,6 +73,7 @@ public class ExerciseService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
 
         double duration = calculateDuration(exerciseLogDTO);
+        log.info(String.valueOf(duration));
         double calories = requestCalories(duration, exerciseLogDTO.getExerciseType(),user);
         findRecord.updateExerciseLog(exerciseLogDTO,duration,calories);
         //recordRepository.save(findRecord);
@@ -98,13 +99,13 @@ public class ExerciseService {
 
     }
 
-    public void putExerciseLog(String username, ExerciseLogDTO exerciseLog) {
+    public double putExerciseLog(String username, ExerciseLogDTO exerciseLog) {
         double durationDouble = calculateDuration(exerciseLog);
         String exerciseType = exerciseLog.getExerciseType();
 
         log.info(String.valueOf(exerciseLog.getStartTime()));
         log.info(String.valueOf(exerciseLog.getEndTime()));
-
+        log.info(String.valueOf(durationDouble));
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
         //머신러닝 모델에서 예상 칼로리 반환
         double calories = requestCalories(durationDouble,exerciseType,user);
@@ -115,7 +116,7 @@ public class ExerciseService {
 
         recordRepository.save(records);
 
-
+        return calories;
     }
 
     private static double calculateDuration(ExerciseLogDTO exerciseLog) {
@@ -123,6 +124,10 @@ public class ExerciseService {
         LocalDateTime startDateTime = exerciseLog.getStartTime();
 
         Duration duration = Duration.between(startDateTime, endDateTime);
+
+        log.info(String.valueOf(startDateTime));
+        log.info(String.valueOf(endDateTime));
+        log.info(String.valueOf(duration.toMinutes()));
 
         double durationDouble = (duration.toMinutes() / 60.0);
         return durationDouble;
@@ -144,7 +149,7 @@ public class ExerciseService {
 
         try {
             MLPredictedCaloriesDTO predictedCalories = WebClient.builder()
-                    .baseUrl("http://localhost:8000")
+                    .baseUrl("http://54.180.26.18:8000")
                     .build().post()
                     .uri("/predict-calories")
                     .header("Content-Type", "application/json")
@@ -172,13 +177,13 @@ public class ExerciseService {
     }
 
 
-    public MLRecommendDTO recommendExercise(String username, double duration) {
+    public MLRecommendDTO recommendExercise(String username, RequestRecommendDTO requestRecommendDTO) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
 
         Map<String, Object> requestBody = new HashMap<>();
         int gender = 0;
 
-        requestBody.put("session_duration",  (double) duration);
+        requestBody.put("session_duration",  (double) requestRecommendDTO.getDuration()/60);
         requestBody.put("age",user.getAge());
         if(user.getGender().equals("Female")) gender=1;
         requestBody.put("gender",gender);
@@ -187,7 +192,7 @@ public class ExerciseService {
 
         try {
             MLRecommendDTO recommendDTO = WebClient.builder()
-                    .baseUrl("http://localhost:8000")
+                    .baseUrl("http://54.180.26.18:8000")
                     .build().post()
                     .uri("/recommend-workout")
                     .header("Content-Type", "application/json")

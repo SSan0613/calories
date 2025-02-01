@@ -17,4 +17,8 @@ public class ResponseRankingDTO {
         this.percent = percent;
         this.value = value;
     }
+
+    public void setRank(Long rank) {
+        this.rank = rank;
+    }
 }

@@ -1,6 +1,7 @@
 package burnCalories.diet.controller;
 
 import burnCalories.diet.DTO.exerciseDTO.ExerciseLogDTO;
+import burnCalories.diet.DTO.exerciseDTO.RequestRecommendDTO;
 import burnCalories.diet.DTO.mlDTO.MLRecommendDTO;
 import burnCalories.diet.DTO.exerciseDTO.ResponseTodayLogDTO;
 import burnCalories.diet.service.ExerciseService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -33,18 +35,18 @@ public class ExerciseController {
 
     //운동 기록하기
     @PostMapping("/logs")
-    public ResponseEntity<String> postExerciseLog(@AuthenticationPrincipal String username, @RequestBody @Valid ExerciseLogDTO exerciseLog) {
+    public ResponseEntity<Map<String,Object>> postExerciseLog(@AuthenticationPrincipal String username, @RequestBody @Valid ExerciseLogDTO exerciseLog) {
         try {
             //운동 입력 시간 검증
             exerciseService.validateDate(exerciseLog);
             //운동 기록 저장
-            exerciseService.putExerciseLog(username, exerciseLog);
+            double calories = exerciseService.putExerciseLog(username, exerciseLog);
 
             //챌린지 진행률 업데이트
             progressService.updateChallengePercent(username);
-            return ResponseEntity.ok("운동 기록 완료");
+            return ResponseEntity.ok(Map.of("calories",calories));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -83,8 +85,8 @@ public class ExerciseController {
     }
 
     @PostMapping("/recommend")
-    public ResponseEntity<MLRecommendDTO> recommendExercise(@AuthenticationPrincipal String username, @RequestBody double duration) {
-        MLRecommendDTO responseRecommendDTO = exerciseService.recommendExercise(username, duration);
+    public ResponseEntity<MLRecommendDTO> recommendExercise(@AuthenticationPrincipal String username, @RequestBody RequestRecommendDTO recommendDTO) {
+        MLRecommendDTO responseRecommendDTO = exerciseService.recommendExercise(username, recommendDTO);
         return ResponseEntity.ok(responseRecommendDTO);
     }
 }

@@ -5,6 +5,7 @@ import burnCalories.diet.domain.Challenge;
 import burnCalories.diet.domain.Participants;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParticipantRepositoryCustom {
     Participants findByUsernameAndChallengeId(String username, Long id);

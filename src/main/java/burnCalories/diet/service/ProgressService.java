@@ -37,17 +37,34 @@ public class ProgressService {
         }
     }
 
-    public List<ResponseRankingDTO> getChallengeRanking(String username, Long id) {
+    public List<ResponseRankingDTO> getChallengeRanking(Long id) {
         List<ResponseRankingDTO> rankingTop10 = participantRepository.findTop10ByOrderByPercent(id);
+        long rank=1;
+        for (ResponseRankingDTO responseRankingDTO : rankingTop10) {
+            responseRankingDTO.setRank(rank++);
+        }
 
+        return rankingTop10;
+/*
         Long userRanking = participantRepository.findUserRanking(username, id);
 
         Participants participants = participantRepository.findByUsernameAndChallengeId(username, id);
         if (participants == null) {
             return new ArrayList<>();
         }
-        rankingTop10.add(new ResponseRankingDTO(participants.getUser().getNickname(),participants.getPercent(),participants.getMyValue(),userRanking));
 
-        return rankingTop10;
+        rankingTop10.add(new ResponseRankingDTO(participants.getUser().getNickname(),participants.getPercent(),participants.getMyValue(),userRanking));
+*/
+
+
+    }
+
+    public ResponseRankingDTO getMyRanking(String username, Long id) {
+
+        Long userRanking = participantRepository.findUserRanking(username, id);
+
+        Participants participants = participantRepository.findByUsernameAndChallengeId(username, id);
+
+        return new ResponseRankingDTO(participants.getUser().getNickname(),participants.getPercent(),participants.getMyValue(),userRanking);
     }
 }

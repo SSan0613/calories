@@ -21,6 +21,7 @@ public class PersonalChallengeController {
 
     private final ChallengeService challengeService;
     private final ProgressService progressService;
+
     //챌린지 목록 조회
     @GetMapping
     public List<ResponseChallengeListDTO> getChallengeAll(@RequestParam(required = false) String exerciseType) {
@@ -75,10 +76,17 @@ public class PersonalChallengeController {
     }
 
     @GetMapping("{id}/rank")
-    public List<ResponseRankingDTO> getChallengeRanking(@AuthenticationPrincipal String username, @PathVariable Long id) {
+    public List<ResponseRankingDTO> getChallengeRanking(@PathVariable Long id) {
         List<ResponseRankingDTO> rankingList;
-        rankingList = progressService.getChallengeRanking(username, id);
+        rankingList = progressService.getChallengeRanking(id);
 
         return rankingList;
+    }
+
+    @GetMapping("{id}/myrank")
+    public ResponseRankingDTO getMyRanking(@AuthenticationPrincipal String username, @PathVariable Long id) {
+        ResponseRankingDTO myRanking = progressService.getMyRanking(username, id);
+
+        return myRanking;
     }
 }

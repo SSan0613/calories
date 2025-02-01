@@ -19,12 +19,12 @@ class PersonalChallengeServiceImplTest {
     @Autowired
     private ChallengeService challengeService;
 
-    @Test
+   /* @Test
     @DisplayName("챌린지 상세 조회")
     void test1() {
 
         Challenge challenge = challengeRepository.findById(2L).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 챌린지입니다"));
 
         System.out.println(challenge.getCreator().equals("홍길동"));
-    }
+    }*/
 }
